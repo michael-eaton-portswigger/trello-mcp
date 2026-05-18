@@ -9,6 +9,11 @@ An MCP server for Trello. Lets Claude view, create, and manage your Trello cards
 
 ## Installation
 
+**Easiest — Claude Desktop via .mcpb bundle:**
+Download `trello-mcp.mcpb` from the [latest release](https://github.com/michael-eaton-portswigger/trello-mcp/releases/latest), double-click it, and follow the prompts. See [docs/installing-via-mcpb.md](docs/installing-via-mcpb.md) for full instructions.
+
+**Manual — Claude Code or building from source:**
+
 ```bash
 git clone https://github.com/michael-eaton-portswigger/trello-mcp.git
 cd trello-mcp
