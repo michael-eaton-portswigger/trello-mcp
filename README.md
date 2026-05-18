@@ -141,6 +141,10 @@ npm run build
 - **URL attachments only**: file uploads are not supported.
 - **Real-time**: the server is request/response only. Claude won't be notified of external board changes between tool calls.
 
+## API Reference
+
+This server communicates with the [Trello REST API](https://developer.atlassian.com/cloud/trello/rest/api-group-actions/). Refer to the Atlassian documentation for details on available fields, rate limits, and response shapes.
+
 ## Licence
 
 MIT
