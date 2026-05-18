@@ -22,15 +22,12 @@ export class TrelloApiError extends Error {
 
 export class TrelloClient {
   private readonly base = "https://api.trello.com/1";
-  private readonly auth: string;
 
   constructor(
     private readonly apiKey: string,
     private readonly token: string,
     public readonly boardId: string,
-  ) {
-    this.auth = `key=${apiKey}&token=${token}`;
-  }
+  ) {}
 
   private async request<T>(
     path: string,
@@ -108,8 +105,6 @@ export class TrelloClient {
     idLabels?: string[];
   }): Promise<TrelloCard> {
     const body = new URLSearchParams({
-      key: this.apiKey,
-      token: this.token,
       idList: params.idList,
       name: params.name,
       ...(params.desc && { desc: params.desc }),
@@ -127,7 +122,7 @@ export class TrelloClient {
     cardId: string,
     fields: Partial<{ name: string; desc: string; due: string | null; idList: string; closed: boolean }>,
   ): Promise<TrelloCard> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token });
+    const body = new URLSearchParams();
     for (const [k, v] of Object.entries(fields)) {
       if (v !== undefined) body.set(k, v === null ? "" : String(v));
     }
@@ -139,7 +134,7 @@ export class TrelloClient {
   }
 
   async addLabelToCard(cardId: string, labelId: string): Promise<void> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, value: labelId });
+    const body = new URLSearchParams({ value: labelId });
     await this.request(`/cards/${cardId}/idLabels`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -160,7 +155,7 @@ export class TrelloClient {
   }
 
   async createChecklist(cardId: string, name: string): Promise<TrelloChecklist> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, idCard: cardId, name });
+    const body = new URLSearchParams({ idCard: cardId, name });
     return this.request<TrelloChecklist>("/checklists", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -169,7 +164,7 @@ export class TrelloClient {
   }
 
   async addChecklistItem(checklistId: string, name: string): Promise<TrelloChecklistItem> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, name });
+    const body = new URLSearchParams({ name });
     return this.request<TrelloChecklistItem>(`/checklists/${checklistId}/checkItems`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -182,7 +177,7 @@ export class TrelloClient {
     checklistItemId: string,
     fields: Partial<{ name: string; state: "complete" | "incomplete" }>,
   ): Promise<TrelloChecklistItem> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, ...fields });
+    const body = new URLSearchParams({ ...fields });
     return this.request<TrelloChecklistItem>(`/cards/${cardId}/checkItem/${checklistItemId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -199,7 +194,7 @@ export class TrelloClient {
   }
 
   async addComment(cardId: string, text: string): Promise<TrelloComment> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, text });
+    const body = new URLSearchParams({ text });
     return this.request<TrelloComment>(`/cards/${cardId}/actions/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -210,7 +205,7 @@ export class TrelloClient {
   // Members
 
   async assignMember(cardId: string, memberId: string): Promise<void> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, value: memberId });
+    const body = new URLSearchParams({ value: memberId });
     await this.request(`/cards/${cardId}/idMembers`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -231,7 +226,7 @@ export class TrelloClient {
   }
 
   async addUrlAttachment(cardId: string, url: string, name?: string): Promise<TrelloAttachment> {
-    const body = new URLSearchParams({ key: this.apiKey, token: this.token, url });
+    const body = new URLSearchParams({ url });
     if (name) body.set("name", name);
     return this.request<TrelloAttachment>(`/cards/${cardId}/attachments`, {
       method: "POST",
