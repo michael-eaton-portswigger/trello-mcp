@@ -69,6 +69,9 @@ export function registerChecklistTools(server: McpServer, client: TrelloClient):
       name: z.string().optional().describe("New item text"),
     },
     async ({ card_id, checklist_item_id, state, name }) => {
+      if (state === undefined && name === undefined) {
+        throw new Error("Provide at least one of: state, name");
+      }
       const fields: Partial<{ name: string; state: "complete" | "incomplete" }> = {};
       if (state !== undefined) fields.state = state;
       if (name !== undefined) fields.name = name;
