@@ -14,32 +14,9 @@ Double-click the downloaded `trello-mcp.mcpb` file. Claude Desktop will open and
 
 ## Step 3 — Fill in the configuration form
 
-The installation dialog will ask for three values:
+The installation dialog will ask for three values: your **API Key**, your **Personal Token**, and your **Board ID**.
 
-### Trello API Key
-
-1. Go to [https://trello.com/app-key](https://trello.com/app-key)
-2. Copy the **API Key** shown at the top of the page
-
-### Trello Token
-
-1. On the same page, click the **Token** link
-2. Click **Allow** to grant access
-3. Copy the token from the resulting page
-
-> Set tokens to **Never** expire unless you have a specific reason to rotate them.
-
-### Trello Board ID
-
-Run the following command in your terminal, substituting your key and token:
-
-```bash
-curl "https://api.trello.com/1/members/me/boards?key=YOUR_KEY&token=YOUR_TOKEN&fields=id,name"
-```
-
-This returns a JSON array of your boards. Copy the `id` value for the board you want to use.
-
-> The short ID visible in the Trello board URL (e.g. `trello.com/b/abc123/...`) is **not** the same as the full board ID returned by the API. Use the `id` field from the API response.
+See [manual-setup.md](manual-setup.md#2-get-your-trello-credentials) for instructions on obtaining each value.
 
 ## Step 4 — Confirm installation
 
