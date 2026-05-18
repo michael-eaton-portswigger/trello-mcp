@@ -76,11 +76,6 @@ describe("TrelloClient", () => {
 
   it("TrelloApiError carries the status code", async () => {
     mockFetch("unauthorized", 401);
-    try {
-      await client.listBoards();
-    } catch (e) {
-      expect(e).toBeInstanceOf(TrelloApiError);
-      expect((e as TrelloApiError).status).toBe(401);
-    }
+    await expect(client.listBoards()).rejects.toMatchObject({ status: 401 });
   });
 });
