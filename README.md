@@ -2,7 +2,7 @@
 
 An MCP server that lets Claude view, create, and manage your Trello cards.
 
-[![CI](https://github.com/michael-eaton-portswigger/trello-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/michael-eaton-portswigger/trello-mcp/actions/workflows/ci.yml)
+[![Test, Build & Validate](https://github.com/michael-eaton-portswigger/trello-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/michael-eaton-portswigger/trello-mcp/actions/workflows/ci.yml)
 
 ## Installation
 
