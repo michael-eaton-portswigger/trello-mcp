@@ -59,7 +59,7 @@ export function registerListTools(server: McpServer, client: TrelloClient): void
 
   server.tool(
     "search_cards",
-    "Search cards across all lists by keyword, label name, or member username",
+    "Search cards across all lists by keyword, label name, or member username (max 1000 results)",
     { query: z.string().describe("Search query") },
     async ({ query }) => {
       const cards = await client.searchCards(query);
@@ -67,7 +67,8 @@ export function registerListTools(server: McpServer, client: TrelloClient): void
         return { content: [{ type: "text", text: `No cards found matching "${query}".` }] };
       }
       const text = cards.map(formatCardSummary).join("\n\n");
-      return { content: [{ type: "text", text: `Found ${cards.length} card(s):\n\n${text}` }] };
+      const suffix = cards.length === 1000 ? "\n\n_(Results capped at 1000 — refine your query to narrow further.)_" : "";
+      return { content: [{ type: "text", text: `Found ${cards.length} card(s):\n\n${text}${suffix}` }] };
     },
   );
 }
