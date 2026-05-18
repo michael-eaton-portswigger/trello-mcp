@@ -1,0 +1,8 @@
+src/
+tests/
+.github/
+tsconfig.json
+.gitignore
+.mcpbignore
+*.test.ts
+*.test.js

@@ -23,3 +23,5 @@ jobs:
       - run: npm test
 
       - run: npm run build
+
+      - run: npx --yes @anthropic-ai/mcpb validate manifest.json

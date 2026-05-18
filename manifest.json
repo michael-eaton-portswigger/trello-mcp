@@ -1,0 +1,81 @@
+{
+  "manifest_version": "0.3",
+  "name": "trello-mcp",
+  "display_name": "Trello",
+  "version": "1.0.0",
+  "description": "View, create, and manage your Trello cards directly from Claude",
+  "author": {
+    "name": "Michael Eaton",
+    "url": "https://github.com/michael-eaton-portswigger"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michael-eaton-portswigger/trello-mcp.git"
+  },
+  "license": "MIT",
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "TRELLO_API_KEY": "${user_config.api_key}",
+        "TRELLO_TOKEN": "${user_config.token}",
+        "TRELLO_BOARD_ID": "${user_config.board_id}"
+      }
+    }
+  },
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "Trello API Key",
+      "description": "Your Trello API key from https://trello.com/app-key",
+      "sensitive": true,
+      "required": true
+    },
+    "token": {
+      "type": "string",
+      "title": "Trello Token",
+      "description": "Your Trello personal token (generate from https://trello.com/app-key)",
+      "sensitive": true,
+      "required": true
+    },
+    "board_id": {
+      "type": "string",
+      "title": "Trello Board ID",
+      "description": "The full ID of the Trello board to manage (run: curl \"https://api.trello.com/1/members/me/boards?key=KEY&token=TOKEN&fields=id,name\")",
+      "required": true
+    }
+  },
+  "tools": [
+    { "name": "list_boards", "description": "List all accessible Trello boards" },
+    { "name": "get_board", "description": "Get the configured board with its lists and card counts" },
+    { "name": "get_list_cards", "description": "Get all open cards in a named list" },
+    { "name": "search_cards", "description": "Search cards across all lists by keyword (max 1000 results)" },
+    { "name": "get_card", "description": "Get full card details including description, due date, labels, checklists, and comments" },
+    { "name": "create_card", "description": "Create a new card in a named list" },
+    { "name": "update_card", "description": "Update a card's name, description, or due date" },
+    { "name": "move_card", "description": "Move a card to a different list" },
+    { "name": "archive_card", "description": "Archive a card (soft delete — recoverable from the Trello UI)" },
+    { "name": "add_label", "description": "Add a label to a card by name or colour" },
+    { "name": "remove_label", "description": "Remove a label from a card" },
+    { "name": "get_checklists", "description": "Get all checklists and their items for a card" },
+    { "name": "create_checklist", "description": "Add a new checklist to a card" },
+    { "name": "add_checklist_item", "description": "Add an item to a checklist" },
+    { "name": "update_checklist_item", "description": "Mark a checklist item complete or incomplete, or rename it" },
+    { "name": "get_comments", "description": "Get comments on a card (newest first)" },
+    { "name": "add_comment", "description": "Post a comment on a card" },
+    { "name": "get_board_members", "description": "List all members on the configured board" },
+    { "name": "assign_member", "description": "Assign a board member to a card by username or full name" },
+    { "name": "unassign_member", "description": "Remove a member from a card" },
+    { "name": "get_attachments", "description": "List URL attachments on a card" },
+    { "name": "add_url_attachment", "description": "Add a URL attachment to a card" }
+  ]
+}
