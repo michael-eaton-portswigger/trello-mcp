@@ -24,7 +24,7 @@ export function registerCardTools(server: McpServer, client: TrelloClient): void
       ];
       if (card.desc) lines.push(`\nDescription:\n${card.desc}`);
       if (card.due) lines.push(`\nDue: ${formatDate(card.due)}${card.dueComplete ? " ✓" : ""}`);
-      if (card.labels.length > 0) lines.push(`Labels: ${card.labels.map(labelDisplay).join(", ")}`);
+      if (card.idLabels.length > 0) lines.push(`Labels: ${card.idLabels.map(labelDisplay).join(", ")}`);
       if (checklists.length > 0) {
         lines.push(`\nChecklists:`);
         for (const cl of checklists) {
@@ -143,13 +143,13 @@ export function registerCardTools(server: McpServer, client: TrelloClient): void
     },
     async ({ card_id, label }) => {
       const card = await client.getCard(card_id);
-      const match = card.labels.find(
+      const match = card.idLabels.find(
         (l) =>
           l.name.toLowerCase() === label.toLowerCase() ||
           (l.color ?? "").toLowerCase() === label.toLowerCase(),
       );
       if (!match) {
-        const current = card.labels.map((l) => `"${labelDisplay(l)}"`).join(", ");
+        const current = card.idLabels.map((l) => `"${labelDisplay(l)}"`).join(", ");
         throw new Error(
           `Card has no label matching "${label}". Current labels: ${current || "none"}`,
         );

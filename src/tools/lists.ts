@@ -87,6 +87,6 @@ export async function resolveList(client: TrelloClient, name: string): Promise<T
 function formatCardSummary(card: TrelloCard): string {
   const parts = [`**${card.name}** (ID: ${card.id})`];
   if (card.due) parts.push(`Due: ${formatDate(card.due)}`);
-  if (card.labels.length > 0) parts.push(`Labels: ${card.labels.map(labelDisplay).join(", ")}`);
+  if (card.idLabels.length > 0) parts.push(`Labels: ${card.idLabels.map(labelDisplay).join(", ")}`);
   return parts.join(" · ");
 }

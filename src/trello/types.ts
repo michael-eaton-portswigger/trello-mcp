@@ -34,7 +34,7 @@ export interface TrelloCard {
   due: string | null;
   dueComplete: boolean;
   closed: boolean;
-  labels: TrelloLabel[];
+  idLabels: TrelloLabel[];
   idMembers: string[];
   pos: number;
 }

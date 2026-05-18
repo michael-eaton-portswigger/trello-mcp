@@ -164,6 +164,93 @@ describe("labelDisplay", () => {
   });
 });
 
+describe("get_card label rendering", () => {
+  it("renders label names from idLabels (not the labels ID array)", async () => {
+    const { registerCardTools } = await import("../src/tools/cards.js");
+
+    let capturedHandler: (args: Record<string, unknown>) => Promise<{ content: { text: string }[] }>;
+    const server = {
+      tool: vi.fn((name, _desc, _schema, handler) => {
+        if (name === "get_card") capturedHandler = handler;
+      }),
+    };
+
+    const card = {
+      id: "c1", name: "My Card", desc: "", idList: "l1", idBoard: "b1",
+      url: "https://trello.com/c/c1", due: null, dueComplete: false, closed: false,
+      idLabels: [{ id: "lb1", name: "Bug", color: "red" }],
+      idMembers: [], pos: 1,
+    };
+
+    const client = makeClient({
+      getCard: vi.fn().mockResolvedValue(card),
+      getChecklists: vi.fn().mockResolvedValue([]),
+      getComments: vi.fn().mockResolvedValue([]),
+      getAttachments: vi.fn().mockResolvedValue([]),
+    });
+
+    registerCardTools(server as never, client);
+    const result = await capturedHandler!({ card_id: "c1" });
+    expect(result.content[0].text).toContain("Bug");
+    expect(result.content[0].text).not.toContain("undefined");
+  });
+});
+
+describe("remove_label tool handler", () => {
+  it("matches label from card.idLabels without throwing", async () => {
+    const { registerCardTools } = await import("../src/tools/cards.js");
+
+    let removeHandler: (args: Record<string, unknown>) => Promise<unknown>;
+    const server = {
+      tool: vi.fn((name, _desc, _schema, handler) => {
+        if (name === "remove_label") removeHandler = handler;
+      }),
+    };
+
+    const card = {
+      id: "c1", name: "Card", desc: "", idList: "l1", idBoard: "b1",
+      url: "https://trello.com/c/c1", due: null, dueComplete: false, closed: false,
+      idLabels: [{ id: "lb1", name: "Bug", color: "red" }],
+      idMembers: [], pos: 1,
+    };
+
+    const removeLabelFromCard = vi.fn().mockResolvedValue(undefined);
+    const client = makeClient({
+      getCard: vi.fn().mockResolvedValue(card),
+      removeLabelFromCard,
+    });
+
+    registerCardTools(server as never, client);
+    await removeHandler!({ card_id: "c1", label: "Bug" });
+    expect(removeLabelFromCard).toHaveBeenCalledWith("c1", "lb1");
+  });
+
+  it("throws a helpful error when the label is not on the card", async () => {
+    const { registerCardTools } = await import("../src/tools/cards.js");
+
+    let removeHandler: (args: Record<string, unknown>) => Promise<unknown>;
+    const server = {
+      tool: vi.fn((name, _desc, _schema, handler) => {
+        if (name === "remove_label") removeHandler = handler;
+      }),
+    };
+
+    const card = {
+      id: "c1", name: "Card", desc: "", idList: "l1", idBoard: "b1",
+      url: "https://trello.com/c/c1", due: null, dueComplete: false, closed: false,
+      idLabels: [{ id: "lb1", name: "Bug", color: "red" }],
+      idMembers: [], pos: 1,
+    };
+
+    const client = makeClient({ getCard: vi.fn().mockResolvedValue(card) });
+    registerCardTools(server as never, client);
+
+    await expect(removeHandler!({ card_id: "c1", label: "Feature" })).rejects.toThrow(
+      /no label matching "Feature"/i,
+    );
+  });
+});
+
 describe("formatDate", () => {
   it("returns the ISO date portion only", async () => {
     const { formatDate } = await import("../src/trello/types.js");

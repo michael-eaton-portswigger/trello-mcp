@@ -97,7 +97,7 @@ export class TrelloClient {
         idBoards: this.boardId,
         modelTypes: "cards",
         cards_limit: "1000",
-        card_fields: "id,name,desc,idList,idBoard,url,due,dueComplete,closed,labels,idMembers,pos",
+        card_fields: "id,name,desc,idList,idBoard,url,due,dueComplete,closed,idLabels,idMembers,pos",
       },
     });
     return results.cards;
