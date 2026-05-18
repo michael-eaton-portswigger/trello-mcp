@@ -13,7 +13,10 @@ An MCP server for Trello. Lets Claude view, create, and manage your Trello cards
 git clone https://github.com/michael-eaton-portswigger/trello-mcp.git
 cd trello-mcp
 npm install
+npm run build
 ```
+
+The build step compiles the TypeScript to `dist/`. The MCP config below points at the compiled output, so you must build before first use (and after pulling updates).
 
 ## Getting Trello Credentials
 
@@ -32,28 +35,26 @@ npm install
 
 ### Board ID
 
-Run the server once (after configuring your credentials), then ask Claude to call `list_boards`. Your board's ID will be in the output. Alternatively, open your Trello board in a browser — the URL contains the board's short ID (e.g. `trello.com/b/abc123/my-board`), but the full ID shown by the API is what you need.
+Run the following curl command with your key and token to list your boards and find the ID you want:
 
-## Configuration
-
-The server reads three environment variables:
-
+```bash
+curl "https://api.trello.com/1/members/me/boards?key=YOUR_KEY&token=YOUR_TOKEN&fields=id,name"
 ```
-TRELLO_API_KEY=your_api_key
-TRELLO_TOKEN=your_personal_token
-TRELLO_BOARD_ID=your_board_id
-```
+
+Copy the `id` value for the board you want to use.
+
+> The short ID in the Trello board URL (e.g. `trello.com/b/abc123/...`) is not the same as the full board ID returned by the API. Use the API response `id` field.
 
 ## Claude Code Setup
 
-Add the following to your `~/.claude/settings.json` under `mcpServers`:
+Add the following to your `~/.claude/settings.json` under `mcpServers`, replacing the path and credentials with your own:
 
 ```json
 {
   "mcpServers": {
     "trello": {
-      "command": "npx",
-      "args": ["tsx", "/path/to/trello-mcp/src/index.ts"],
+      "command": "node",
+      "args": ["/path/to/trello-mcp/dist/index.js"],
       "env": {
         "TRELLO_API_KEY": "your_api_key",
         "TRELLO_TOKEN": "your_personal_token",
@@ -64,7 +65,11 @@ Add the following to your `~/.claude/settings.json` under `mcpServers`:
 }
 ```
 
-Replace `/path/to/trello-mcp` with the actual path where you cloned this repo.
+Replace `/path/to/trello-mcp` with the absolute path to where you cloned this repo (e.g. `/Users/yourname/vcs/trello-mcp`).
+
+## Claude Desktop Setup
+
+Add the same block to `~/Library/Application Support/Claude/claude_desktop_config.json` under `mcpServers`.
 
 ## Available Tools
 
@@ -72,10 +77,10 @@ Replace `/path/to/trello-mcp` with the actual path where you cloned this repo.
 
 | Tool | Description |
 |---|---|
-| `list_boards` | List all accessible Trello boards (useful for finding your board ID) |
+| `list_boards` | List all accessible Trello boards |
 | `get_board` | Get the configured board with its lists and card counts |
 | `get_list_cards` | Get all open cards in a named list |
-| `search_cards` | Search cards across all lists by keyword |
+| `search_cards` | Search cards across all lists by keyword (max 1000 results) |
 
 ### Cards
 
@@ -83,7 +88,7 @@ Replace `/path/to/trello-mcp` with the actual path where you cloned this repo.
 |---|---|
 | `get_card` | Get full card details (description, due date, labels, checklists, comments) |
 | `create_card` | Create a card in a named list |
-| `update_card` | Update a card's name, description, or due date |
+| `update_card` | Update a card's name, description, or due date (pass `null` to clear due date) |
 | `move_card` | Move a card to a different list |
 | `archive_card` | Archive a card (recoverable from the Trello UI) |
 | `add_label` | Add a label to a card by name or colour |
@@ -110,7 +115,7 @@ Replace `/path/to/trello-mcp` with the actual path where you cloned this repo.
 | Tool | Description |
 |---|---|
 | `get_board_members` | List all members on the configured board |
-| `assign_member` | Assign a member to a card |
+| `assign_member` | Assign a member to a card by username or full name |
 | `unassign_member` | Remove a member from a card |
 | `get_attachments` | List attachments on a card |
 | `add_url_attachment` | Attach a URL to a card |
@@ -118,22 +123,22 @@ Replace `/path/to/trello-mcp` with the actual path where you cloned this repo.
 ## Development
 
 ```bash
-# Run with live reload
-npm run dev
-
-# Type-check
-npx tsc --noEmit
-
 # Run tests
 npm test
+
+# Type-check without building
+npx tsc --noEmit
+
+# Rebuild after making changes
+npm run build
 ```
 
 ## Notes
 
-- **One board**: this server is designed around a single configured board. Use `list_boards` to find your board ID, then set `TRELLO_BOARD_ID` and leave it.
-- **No hard delete**: cards are archived (soft delete), not permanently deleted. You can recover them from the Trello UI.
-- **No list management**: creating or deleting lists is intentionally out of scope. Manage your list structure (workflow states) from the Trello UI.
-- **URL attachments only**: file uploads are not supported. Attachments are URL-based.
+- **One board**: the server is configured around a single board. Use `list_boards` to find board IDs, set `TRELLO_BOARD_ID`, and leave it.
+- **No hard delete**: cards are archived (soft delete), not permanently deleted. Recover them from the Trello UI.
+- **No list management**: creating or deleting lists is intentionally out of scope. Manage your board structure from the Trello UI.
+- **URL attachments only**: file uploads are not supported.
 - **Real-time**: the server is request/response only. Claude won't be notified of external board changes between tool calls.
 
 ## Licence
