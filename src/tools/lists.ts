@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { TrelloClient } from "../trello/client.js";
+import { formatDate, labelDisplay } from "../trello/types.js";
 import type { TrelloCard, TrelloList } from "../trello/types.js";
 
 export function registerListTools(server: McpServer, client: TrelloClient): void {
@@ -85,7 +86,7 @@ export async function resolveList(client: TrelloClient, name: string): Promise<T
 
 function formatCardSummary(card: TrelloCard): string {
   const parts = [`**${card.name}** (ID: ${card.id})`];
-  if (card.due) parts.push(`Due: ${new Date(card.due).toLocaleDateString()}`);
-  if (card.labels.length > 0) parts.push(`Labels: ${card.labels.map((l) => l.name || l.color).join(", ")}`);
+  if (card.due) parts.push(`Due: ${formatDate(card.due)}`);
+  if (card.labels.length > 0) parts.push(`Labels: ${card.labels.map(labelDisplay).join(", ")}`);
   return parts.join(" · ");
 }

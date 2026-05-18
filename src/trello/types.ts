@@ -68,3 +68,15 @@ export interface TrelloAttachment {
   mimeType: string;
   isUpload: boolean;
 }
+
+export function labelDisplay(l: TrelloLabel): string {
+  return l.name || l.color || l.id;
+}
+
+export function formatDate(iso: string): string {
+  return iso.slice(0, 10);
+}
+
+export function formatDateTime(iso: string): string {
+  return iso.replace("T", " ").slice(0, 16) + " UTC";
+}

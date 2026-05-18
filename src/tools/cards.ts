@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { TrelloClient } from "../trello/client.js";
+import { formatDate, labelDisplay } from "../trello/types.js";
 import { resolveList } from "./lists.js";
 
 export function registerCardTools(server: McpServer, client: TrelloClient): void {
@@ -22,8 +23,8 @@ export function registerCardTools(server: McpServer, client: TrelloClient): void
         `URL: ${card.url}`,
       ];
       if (card.desc) lines.push(`\nDescription:\n${card.desc}`);
-      if (card.due) lines.push(`\nDue: ${new Date(card.due).toLocaleDateString()}${card.dueComplete ? " ✓" : ""}`);
-      if (card.labels.length > 0) lines.push(`Labels: ${card.labels.map((l) => l.name || l.color).join(", ")}`);
+      if (card.due) lines.push(`\nDue: ${formatDate(card.due)}${card.dueComplete ? " ✓" : ""}`);
+      if (card.labels.length > 0) lines.push(`Labels: ${card.labels.map(labelDisplay).join(", ")}`);
       if (checklists.length > 0) {
         lines.push(`\nChecklists:`);
         for (const cl of checklists) {
@@ -125,11 +126,11 @@ export function registerCardTools(server: McpServer, client: TrelloClient): void
           (l.color ?? "").toLowerCase() === label.toLowerCase(),
       );
       if (!match) {
-        const valid = boardLabels.map((l) => `"${l.name || l.color}"`).join(", ");
+        const valid = boardLabels.map((l) => `"${labelDisplay(l)}"`).join(", ");
         throw new Error(`No label matching "${label}". Available: ${valid}`);
       }
       await client.addLabelToCard(card_id, match.id);
-      return { content: [{ type: "text", text: `Added label "${match.name || match.color}" to card.` }] };
+      return { content: [{ type: "text", text: `Added label "${labelDisplay(match)}" to card.` }] };
     },
   );
 
@@ -148,13 +149,13 @@ export function registerCardTools(server: McpServer, client: TrelloClient): void
           (l.color ?? "").toLowerCase() === label.toLowerCase(),
       );
       if (!match) {
-        const current = card.labels.map((l) => `"${l.name || l.color}"`).join(", ");
+        const current = card.labels.map((l) => `"${labelDisplay(l)}"`).join(", ");
         throw new Error(
           `Card has no label matching "${label}". Current labels: ${current || "none"}`,
         );
       }
       await client.removeLabelFromCard(card_id, match.id);
-      return { content: [{ type: "text", text: `Removed label "${match.name || match.color}" from card.` }] };
+      return { content: [{ type: "text", text: `Removed label "${labelDisplay(match)}" from card.` }] };
     },
   );
 }

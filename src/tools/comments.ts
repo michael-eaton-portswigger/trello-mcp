@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { TrelloClient } from "../trello/client.js";
+import { formatDateTime } from "../trello/types.js";
 
 export function registerCommentTools(server: McpServer, client: TrelloClient): void {
   server.tool(
@@ -13,8 +14,7 @@ export function registerCommentTools(server: McpServer, client: TrelloClient): v
         return { content: [{ type: "text", text: "No comments on this card." }] };
       }
       const lines = comments.map((c) => {
-        const date = new Date(c.date).toLocaleString();
-        return `**${c.memberCreator.fullName}** (${date}):\n${c.data.text}`;
+        return `**${c.memberCreator.fullName}** (${formatDateTime(c.date)}):\n${c.data.text}`;
       });
       return { content: [{ type: "text", text: lines.join("\n\n---\n\n") }] };
     },
