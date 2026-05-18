@@ -70,6 +70,12 @@ export class TrelloClient {
     return this.request<TrelloMember[]>(`/boards/${this.boardId}/members`);
   }
 
+  async getBoardCards(): Promise<TrelloCard[]> {
+    return this.request<TrelloCard[]>(`/boards/${this.boardId}/cards`, {
+      params: { filter: "open" },
+    });
+  }
+
   // Lists
 
   async getListCards(listId: string): Promise<TrelloCard[]> {

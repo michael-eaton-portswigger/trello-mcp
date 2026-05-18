@@ -17,21 +17,26 @@ export function registerListTools(server: McpServer, client: TrelloClient): void
     "Get the configured board with its lists and card counts",
     {},
     async () => {
-      const [board, lists] = await Promise.all([client.getBoard(), client.getLists()]);
+      const [board, lists, allCards] = await Promise.all([
+        client.getBoard(),
+        client.getLists(),
+        client.getBoardCards(),
+      ]);
 
-      const listCards = await Promise.all(
-        lists.map(async (l) => {
-          const cards = await client.getListCards(l.id);
-          return { list: l, count: cards.length };
-        }),
-      );
+      const cardsByList = new Map<string, number>();
+      for (const card of allCards) {
+        cardsByList.set(card.idList, (cardsByList.get(card.idList) ?? 0) + 1);
+      }
 
       const lines = [
         `**${board.name}**`,
         `URL: ${board.url}`,
         "",
         "Lists:",
-        ...listCards.map(({ list, count }) => `• ${list.name} — ${count} card${count !== 1 ? "s" : ""}`),
+        ...lists.map((l) => {
+          const count = cardsByList.get(l.id) ?? 0;
+          return `• ${l.name} — ${count} card${count !== 1 ? "s" : ""}`;
+        }),
       ];
       return { content: [{ type: "text", text: lines.join("\n") }] };
     },
